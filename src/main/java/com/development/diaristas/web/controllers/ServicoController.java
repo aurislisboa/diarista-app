@@ -11,6 +11,7 @@ import com.development.diaristas.core.repositories.ServicoRepository;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -43,8 +44,26 @@ public class ServicoController {
     public String cadastrar(Servico servico) {
         repository.save(servico);
 
-        return "redirect:/admin/servicos/cadastrar";
+        return "redirect:/admin/servicos";
     }
 
+
+    @GetMapping
+    public ModelAndView buscarTodos() {
+        var modelAndView = new ModelAndView("admin/servico/lista");
+
+        modelAndView.addObject("servicos", repository.findAll());
+
+        return modelAndView;
+    }
+
+    @GetMapping("/{id}/excluir")
+    public String excluir(@PathVariable Long id) {
+        repository.deleteById(id);
+        
+        return "redirect:/admin/servicos";
+    }
     
+
+
 }
