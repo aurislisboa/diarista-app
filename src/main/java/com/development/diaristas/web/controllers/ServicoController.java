@@ -3,24 +3,123 @@ package com.development.diaristas.web.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
-
-import com.development.diaristas.core.enums.Icone;
-import com.development.diaristas.core.models.Servico;
-import com.development.diaristas.core.repositories.ServicoRepository;
-import com.development.diaristas.web.dtos.ServicoForm;
-import com.development.diaristas.web.mappers.WebServicoMapper;
-
-import jakarta.validation.Valid;
-
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.development.diaristas.core.enums.Icone;
+import com.development.diaristas.web.dtos.ServicoForm;
+import com.development.diaristas.web.services.WebServicoService;
+
+import jakarta.validation.Valid;
 
 
+@Controller
+@RequestMapping("/admin/servicos")
+public class ServicoController {
+    
+
+    @Autowired
+    private WebServicoService service;
+
+
+    @ModelAttribute("icones")
+    public Icone[] getIcones() {
+        return Icone.values();
+    }
+
+
+    
+    @GetMapping
+    public ModelAndView buscarTodos() {
+        var modelAndView = new ModelAndView("admin/servico/lista");
+
+        modelAndView.addObject("servicos", service.buscarTodos());
+
+        return modelAndView;
+    }
+
+
+
+    @GetMapping("/cadastrar")
+    public ModelAndView cadastrar() {
+        var modelAndView = new ModelAndView("/admin/servico/form");
+        
+        modelAndView.addObject("form", new ServicoForm());
+
+        return modelAndView;
+    }
+
+
+
+    @PostMapping("/cadastrar")
+    public String cadastrar(@Valid @ModelAttribute("form") ServicoForm form, BindingResult result) {
+        
+        if (result.hasErrors()) {
+            return "admin/servico/form";
+        }
+        
+        service.cadastrar(form);
+
+        return "redirect:/admin/servicos";
+    }
+
+
+
+     
+    @GetMapping("/{id}/editar")
+    public ModelAndView editar(@PathVariable Long id) {
+        var modelAndView = new ModelAndView("admin/servico/form");
+
+        modelAndView.addObject("form", service.buscarPorId(id));
+       
+        return modelAndView;
+    }
+
+
+
+    @PostMapping("/{id}/editar")
+    public String editar(@PathVariable Long id, @Valid @ModelAttribute("form") ServicoForm form, BindingResult result) {
+
+        System.out.println("_______________________________\n\n" + form);
+
+        if (result.hasErrors()) {
+            return "admin/servico/form";
+        }
+
+        service.editar(form, id);
+        
+        return "redirect:/admin/servicos";
+    }
+
+
+
+    @GetMapping("/{id}/excluir")
+    public String excluir(@PathVariable Long id) {
+        
+        service.excluirPorId(id);
+        
+        return "redirect:/admin/servicos";
+    }
+    
+
+
+}
+
+
+
+
+
+// ====================================================================
+// SEGUNDO CÓDIGO 
+// ====================================================================
+
+
+/*
+ 
 @Controller
 @RequestMapping("/admin/servicos")
 public class ServicoController {
@@ -57,6 +156,7 @@ public class ServicoController {
 
         return modelAndView;
     }
+
 
     @PostMapping("/cadastrar")
     public String cadastrar(@Valid @ModelAttribute("form") ServicoForm form, BindingResult result) {
@@ -114,9 +214,19 @@ public class ServicoController {
 
 
 
+*/
+
+
+
+
+
+// ====================================================================
+// PRIMEIRO CÓDIGO 
+// ====================================================================
 
 
 /*
+
  
 @Controller
 @RequestMapping("/admin/servicos")
